@@ -1,19 +1,28 @@
 package com.tsystems.javaschool.tasks.calculator;
 import java.util.Stack;
 import java.util.ArrayList;
+import java.text.DecimalFormat;
 
 public class Calculator {
-
+    // Evaluates  expression
     public String evaluate(String statement) {
+        // Parsing an expression
         ArrayList<Object> parsedList = parse(statement);
+        // Causes of null result:
+        // * Extra separator
+        // * Statement either null or empty
         if (parsedList == null) return null;
+        // Converting into a postfix form
         ArrayList<Object> postfixArray = toPostfix(parsedList);
+        // Causes of null result:
+        // * Brackets mismatch
         if (postfixArray  == null) return null;
         Stack<Double> operandStack = new Stack<>();
         for (Object object: postfixArray) {
             if (object instanceof  Double) {
                 operandStack.push((Double)object);
             } else {
+                // Extra operator
                 if (operandStack.size() < 2) return  null;
                 double operand2 = operandStack.pop();
                 double operand1 = operandStack.pop();
@@ -37,9 +46,10 @@ public class Calculator {
         if (operandStack.size() > 1) return null;
         Double result = operandStack.pop();
         if (result % 1 < 0.0000001) return Integer.toString((int) Math.round(result));
-        else return result.toString();
+        else return new DecimalFormat("#.####").format(result).replace(",",".");
     }
 
+    // Converts list of operands and operators from infix form to postfix from
     private ArrayList<Object> toPostfix(ArrayList<Object> inputArray) {
         ArrayList<Object> outputArray = new ArrayList<>();
         Stack<String> operationStack = new Stack<>();
@@ -66,6 +76,7 @@ public class Calculator {
         return outputArray;
     }
 
+    // Parses string into a list of objects. Objects are either strings or doubles.
     private ArrayList<Object> parse(String statement) {
         if (statement == null || statement.isEmpty()) return null;
         ArrayList<Object> parsedList = new ArrayList<>();
@@ -100,6 +111,7 @@ public class Calculator {
         return parsedList;
     }
 
+    // Gives a priority of an operation
     private int getPriority(String operation) {
         if (operation.equals("*") || operation.equals("/")) return 2;
         else return 1;
